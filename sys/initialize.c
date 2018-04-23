@@ -195,7 +195,8 @@ sysinit()
 	int status;                        
 	init_bsm();                          // Initialize backing store map table
 	init_frm();                          // Initialize frame table
-	create_global_page_tables();         // Create page tables for global memory
+	status = create_global_page_tables();// Create page tables for global memory
+	if (status == SYSERR) { return SYSERR; }
 	status = new_page_dir(NULLPROC);     // Create new page directory
 	if (status == SYSERR) { return SYSERR; }
 	write_cr3(pptr->pdbr);               // Set CR3 red to correct page dir
@@ -288,9 +289,7 @@ int create_global_page_tables() {
 
 	for (page=0; page<4; page++) {
 		ptable = new_page_table(NULLPROC);
-		if (frame_id == SYSERR) {
-		return(SYSERR);
-		}
+		if (ptable == SYSERR) { return(SYSERR); }
 		global_page_tables[page] = ptable;
 		for (entry=0; entry<1024; entry++) {
 			ptable[entry].pt_pres = 1;
@@ -298,4 +297,5 @@ int create_global_page_tables() {
 			ptable[entry].pt_base = page * 1024 + entry;
 		}
 	}
+	return(OK);
 }
