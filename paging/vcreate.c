@@ -32,6 +32,8 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 	unsigned long *hpaddr;
 	bsd_t bs_id;
 	struct pentry *pptr;
+	struct mblock *block;
+	unsigned long bs_addr;
 
 	// Get Free BS_ID
 	status = get_bsm(&bs_id); 
@@ -54,9 +56,18 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 	pptr->store = bs_id;
 	pptr->vhpno = 4096;
 	pptr->vhpnpages = hsize;
-	// Need to update vmemlist
-	//hpaddr = (int *) (BACKING_STORE_BASE + (bs_id * BACKING_STORE_UNIT_SIZE))
-	//*hpaddr = (struct mblock *) NULL;
+	// Virtual location of first mblock is at first byte of heap
+	pptr->vmemlist->mnext = (struct mblock *) VHEAP_START;
+	// Size of first (and only) block is size of heap
+	pptr->vmemlist->mlen = hsize * NBPG;
+
+	// Physical location of first mblock is at first byte of backing store
+	bs_addr = BACKING_STORE_BASE + (bs_id * BACKING_STORE_UNIT_SIZE);
+	block = (struct mblock *) bs_addr;
+	//Mark this as the end of the list.
+	block->mnext = (struct mblock *) NULL;
+	// Size of first (and only) block is size of heap
+	block->mlen = hsize * NBPG;
 }
 
 /*------------------------------------------------------------------------
