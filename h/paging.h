@@ -61,6 +61,7 @@ typedef struct{
 
 extern bs_map_t bsm_tab[];
 extern fr_map_t frm_tab[];
+
 /* Prototypes for required API calls */
 SYSCALL xmmap(int, bsd_t, int);
 SYSCALL xunmap(int);
@@ -86,6 +87,7 @@ SYSCALL grpolicy();
 #define NBPG		4096	/* number of bytes per page	*/
 #define FRAME0		1024	/* zero-th frame		*/
 #define NFRAMES 	1024	/* number of frames		*/
+#define VHEAP_START 0x1000000
 
 #define BSM_UNMAPPED	0
 #define BSM_MAPPED	1
