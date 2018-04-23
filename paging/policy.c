@@ -78,6 +78,7 @@ int new_page_table(int pid) {
 	int frame_id, status, i;
 	unsigned long frm_addr;
 	pt_t *ptentry;
+	fr_map_t fptr;
 
     // Get a new frame to house the directory
 	status = get_frm(&frame_id);
