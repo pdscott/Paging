@@ -45,6 +45,7 @@ SYSCALL get_bsm(int* avail) {
  *-------------------------------------------------------------------------
  */
 SYSCALL free_bsm(int i) {
+    // should not release a shared backing store
     bs_map_t *bsptr;
 
     bsptr = bsm_tab[i];
@@ -89,6 +90,7 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth) {
  */
 SYSCALL bsm_map(int pid, int vpno, int source, int npages) {
     // make sure this source backing store is not already mapped
+    if (vpno < 0 || vpno > 4096) { return(SYSERR); }
     if (bsm_tab[source].bs_status != BSM_UNMAPPED) { return(SYSERR); }
 
     if (bsm_tab[source].bs_status == BSM_UNMAPPED) {
@@ -107,14 +109,13 @@ SYSCALL bsm_map(int pid, int vpno, int source, int npages) {
  *-------------------------------------------------------------------------
  */
 SYSCALL bsm_unmap(int pid, int vpno, int flag) {
-    int store, pageth, status;
+    int bs_id, frame_id, page, status;
 
-    status = bsm_lookup(pid, vpno * NPBG, &store, &pageth);
+    if (vpno < 0 || vpno > 4096) { return(SYSERR); }
+    status = bsm_lookup(pid, vpno * NBPG, &bs_id, &page);
     if (status == SYSERR) { return(SYSERR); }
     
-
-        // write dirty pages 
-        // 
+    // remove mapping
     
 }
 

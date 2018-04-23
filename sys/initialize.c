@@ -195,11 +195,11 @@ sysinit()
 	init_bsm();                          // Initialize backing store map table
 	init_frame();                        // Initialize frame table
 	create_global_page_tables();         // Create page tables for global memory
+	pdentry = new_page_dir(NULLPROC);    // Create new page directory
+	if (pdentry == SYSERR) { return SYSERR; }
+	write_cr3(pptr->pdbr);               // Set CR3 red to correct page dir
 	set_evec(14, pfintr);                // Set page fault handler
 	enable_paging();                     // Set CR0 reg to enable paging
-	pdentry = new_page_dir(NULLPROC);    // Create new page directory
-	if (pdentry == SYSERR) { return SYSERR };
-	write_cr3(pptr->pdbr);               // Set CR3 red to correct page dir
 	/*========================================================================*/
 
 	pptr->pstate = PRCURR;

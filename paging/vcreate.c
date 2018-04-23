@@ -35,27 +35,19 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 
 	// Get Free BS_ID
 	status = get_bsm(&bs_id); 
-	if (status == SYSERR) {
-		return(SYSERR); 
-	}
+	if (status == SYSERR) { return(SYSERR); }
 
 	// Reserve Pages in BS
     pages = get_bs(bs_id, hsize);
-	if (pages == SYSERR || pages < hsize) {
-		return(SYSERR); 
-	}
+	if (pages == SYSERR || pages < hsize) { return(SYSERR); }
 
 	// Get a new PID
 	pid = create(procaddr, ssize, priority, name, nargs, args);
-	if (pid == SYSERR) {
-		return(SYSERR);
-	}
+	if (pid == SYSERR) { return(SYSERR); }
 
 	// Create the BS Mapping
     status = bsm_map(pid, 4096, bs_id, hsize);
-	if(status == SYSERR) {
-		return(SYSERR);
-	}
+	if(status == SYSERR) { return(SYSERR); }
 
 	// Update process table 
 	pptr = &proctab[pid];
@@ -65,14 +57,6 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 	// Need to update vmemlist
 	heapaddr = (int *) (BACKING_STORE_BASE + (bs_id * BACKING_STORE_UNIT_SIZE))
 	*heapaddr = (struct mblock *) NULL;
-
-
-
-
-
-
-
-
 }
 
 /*------------------------------------------------------------------------
