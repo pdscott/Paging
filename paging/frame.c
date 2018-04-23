@@ -13,7 +13,7 @@ SYSCALL init_frm() {
 	fr_map_t *fptr;
 
 	for (num=0; num < NFRAMES; num++) {
-		fptr = frm_tab[num];
+		fptr = &frm_tab[num];
 		clear_frm(fptr);
 	}
 
@@ -34,10 +34,8 @@ SYSCALL get_frm(int* avail) {
 		}
 	}
 	if (page_replace_policy == SC) {
-
 		return(OK);
 	} else if (page_replace_policy == LFU) {
-
 		return(OK);
 	}
 	return(SYSERR);
@@ -56,19 +54,13 @@ SYSCALL free_frm(int i) {
 	unsigned int pdoffset;
 	unsigned int ptoffset;
 	
-	if (i<0 || i>NFRAMES) {
-		return(SYSERR);
-	} 
+	if (i<0 || i>NFRAMES) { return(SYSERR); } 
 	fptr = frm_tab[i];
-	if (fptr->fr_type != FR_PAGE) {
-		return(SYSERR);
-	}
+	if (fptr->fr_type != FR_PAGE) { return(SYSERR); }
 	pid = fptr->fr_pid; 
 	vaddr = fptr->fr_vpno * NBPG;
 	status = bsm_lookup(fptr->fr_pid, vaddr, &store, &pageth);
-	if (status == SYSERR) {
-		return(SYSERR);
-	}
+	if (status == SYSERR) { return(SYSERR); }
 	//write page if dirty?
 
 	// Find the page table entry

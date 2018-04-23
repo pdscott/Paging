@@ -11,11 +11,9 @@ extern int page_replace_policy;
  *-------------------------------------------------------------------------
  */
 SYSCALL srpolicy(int policy) {
-	if(policy != SC && policy != LFU) {
-		return(SYSERR);
-	}
+	if(policy != SC && policy != LFU) { return(SYSERR); }
 	page_replace_policy = policy;
-	return(OK)
+	return(OK);
 }
 
 /*-------------------------------------------------------------------------
@@ -34,9 +32,7 @@ int new_page_dir(int pid) {
 
 	// Get a new frame to house the directory
 	status = get_frm(&frame_id);
-	if (status == SYSERR) {
-		return(SYSERR);
-	}
+	if (status == SYSERR) { return(SYSERR); }
 
 	// Initialize the new frame in frame table
 	fptr = frm_tab[frame_id];
@@ -84,9 +80,7 @@ int new_page_table(int pid) {
 
     // Get a new frame to house the directory
 	status = get_frm(&frame_id);
-	if (status == SYSERR) {
-		return(SYSERR);
-	}
+	if (status == SYSERR) { return(SYSERR); }
 
 	// Initialize the new frame in frame table
 	fptr = frm_tab[frame_id];

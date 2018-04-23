@@ -87,7 +87,7 @@ SYSCALL write_bs(char *, bsd_t, int);
 #define FR_DIR		2
 
 #define SC 3
-#define AGING 4
+#define LFU 4
 
 #define BACKING_STORE_BASE	0x00800000
 #define BACKING_STORE_UNIT_SIZE 0x00080000
