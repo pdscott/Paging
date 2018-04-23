@@ -71,7 +71,7 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth) {
     
     vpno = ((unsigned long)vaddr)>>12;
     for (bs_id=0; bs_id<16; bs_id++) {
-        bsptr = bsm_tab[bs_id];
+        bsptr = &bsm_tab[bs_id];
         if (bsptr->bs_status != BSM_UNMAPPED) {
             if (bsptr->bs_vpno <= vpno && vpno <= (bsptr->bs_vpno + bsptr->bs_npages)) {
             	*store = bs_id;
