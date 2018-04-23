@@ -91,6 +91,7 @@ SYSCALL free_frm(int i) {
 	pt_t *ptentry;
 	unsigned int pdoffset;
 	unsigned int ptoffset;
+	unsigned long fr_addr;
 	
 	if (i<0 || i>NFRAMES) { return(SYSERR); } 
 	fptr = &frm_tab[i];
@@ -99,7 +100,8 @@ SYSCALL free_frm(int i) {
 	vaddr = fptr->fr_vpno * NBPG;
 	status = bsm_lookup(fptr->fr_pid, vaddr, &store, &pageth);
 	if (status == SYSERR) { return(SYSERR); }
-	write_bs(); ////////////
+	fr_addr = FRAME0 * NBPG + i * NBPG;
+	write_bs(fr_addr, store, pageth);
 
 	// Find the page table entry
 	pdoffset = (unsigned int) vaddr >> 22;
