@@ -11,10 +11,14 @@
  */
 SYSCALL init_bsm() {
     int i;
+    bs_map_t *bsptr;
 
     for (i=0; i<16; i++) {
-        bsm_tab[i].bs_status = BSM_UNMAPPED;
-        // other bsm initialization
+        bsptr = bsm_tab[i];
+        bsptr->bs_status = BSM_UNMAPPED;
+        bsptr->pid = -1;
+        bsptr->vpno = -1;
+        bsptr->npages = 0;
     }
 
 }
@@ -41,11 +45,14 @@ SYSCALL get_bsm(int* avail) {
  *-------------------------------------------------------------------------
  */
 SYSCALL free_bsm(int i) {
-    // see if bs is shared 
-    if (bsm_tab[i].bs_status == BSM_UNMAPPED) {
-        return(SYSERR)
-    }
-    bsm_tab[i].bs_status == BSM_UNMAPPED;
+    bs_map_t *bsptr;
+
+    bsptr = bsm_tab[i];
+    if (bsptr->bs_status == BSM_UNMAPPED) { return(SYSERR); }
+    bsptr->bs_status = BSM_UNMAPPED;
+    bsptr->pid = -1;
+    bsptr->vpno = -1;
+    bsptr->npages = 0;
     return(OK);
 
 }
@@ -58,24 +65,21 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth) {
 // receive process id and virtual address
 // set store to store descriptor
 // set pageth to the correct page in the store for the virtual address
-    int i, vpno;
+    int bs_id, vpno;
+    bs_map_t *bsptr;
     
-    vpno = vaddr>>12;
-    for (i=0; i<16; i++) {
-        if (bs_map[i].bs_status != BSM_UNMAPPED) {
-            // make sure pid actually owns this bs
-            first = bs_map[i].bs_vpno;
-            last = bs_map[i].bs_vpno + bs_map[i].bs_npages;
-            if (first <= vpno && vpno <= last) {
-            	*store = i;
-                *pageth = vpno - bs_map[i].bs_vpno
-                return(OK)
+    vpno = ((unsigned long)vaddr)>>12;
+    for (bs_id=0; bs_id<16; bs_id++) {
+        bsptr = bsmap[bs_id];
+        if (bsptr->bs_status != BSM_UNMAPPED) {
+            if (bsptr->bsvpno <= vpno && vpno <= (bsptr->bs_vpno + bsptr->bsnpages)) {
+            	*store = bs_id;
+                *pageth = vpno - bsptr->bs_vpno;
+                return(OK);
             }
         }
-    } 
-    return(SYSERR)    
-
-    
+    }
+    return(SYSERR);
 }
 
 
@@ -85,17 +89,13 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth) {
  */
 SYSCALL bsm_map(int pid, int vpno, int source, int npages) {
     // make sure this source backing store is not already mapped
-    if (bsm_tab[source].bs_status != BSM_UNMAPPED) {
-        return(SYSERR);
-    }
-
-    // make sure this process is not already mapped?
+    if (bsm_tab[source].bs_status != BSM_UNMAPPED) { return(SYSERR); }
 
     if (bsm_tab[source].bs_status == BSM_UNMAPPED) {
         bsm_tab[source].bs_status == BSM_MAPPED;
-        bsm_tab[source].bs_npages = npages;
-        bsm_tab[source].bs_ref = pid;
+        bsm_tab[source].bs_pid = pid;
         bsm_tab[source].bs_vpno = vpno;
+        bsm_tab[source].bs_npages = npages;
     }
     return(OK);
 }
@@ -107,13 +107,15 @@ SYSCALL bsm_map(int pid, int vpno, int source, int npages) {
  *-------------------------------------------------------------------------
  */
 SYSCALL bsm_unmap(int pid, int vpno, int flag) {
-    int store, pageth;
-    if (bsm_lookup(pid, vpno * NPBG, &store, &pageth) == SYSERR) {
-        return(SYSERR);
-    }  else {
+    int store, pageth, status;
+
+    status = bsm_lookup(pid, vpno * NPBG, &store, &pageth);
+    if (status == SYSERR) { return(SYSERR); }
+    
+
         // write dirty pages 
         // 
-    }
+    
 }
 
 

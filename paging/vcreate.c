@@ -26,10 +26,53 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 	char	*name;			/* name (for debugging)		*/
 	int	nargs;			/* number of args that follow	*/
 	long	args;			/* arguments (treated like an	*/
-					/* array in the code)		*/
-{
-	kprintf("To be implemented!\n");
-	return OK;
+					/* array in the code)		*/                    {
+	
+	int status, pid, pages;
+	unsigned long *haddr;
+	bsd_t bs_id;
+	struct pentry *pptr;
+
+	// Get Free BS_ID
+	status = get_bsm(&bs_id); 
+	if (status == SYSERR) {
+		return(SYSERR); 
+	}
+
+	// Reserve Pages in BS
+    pages = get_bs(bs_id, hsize);
+	if (pages == SYSERR || pages < hsize) {
+		return(SYSERR); 
+	}
+
+	// Get a new PID
+	pid = create(procaddr, ssize, priority, name, nargs, args);
+	if (pid == SYSERR) {
+		return(SYSERR);
+	}
+
+	// Create the BS Mapping
+    status = bsm_map(pid, 4096, bs_id, hsize);
+	if(status == SYSERR) {
+		return(SYSERR);
+	}
+
+	// Update process table 
+	pptr = &proctab[pid];
+	pptr->store = bs_id;
+	pptr->bhpno = 4096;
+	pptr->hsize = hsize;
+	// Need to update vmemlist
+	heapaddr = (int *) (BACKING_STORE_BASE + (bs_id * BACKING_STORE_UNIT_SIZE))
+	*heapaddr = (struct mblock *) NULL;
+
+
+
+
+
+
+
+
 }
 
 /*------------------------------------------------------------------------

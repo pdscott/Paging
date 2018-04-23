@@ -10,10 +10,8 @@
  * xmmap - xmmap
  *-------------------------------------------------------------------------
  */
-SYSCALL xmmap(int virtpage, bsd_t source, int npages)
-{
-  kprintf("xmmap - to be implemented!\n");
-  return SYSERR;
+SYSCALL xmmap(int virtpage, bsd_t source, int npages) {
+	return bsm_map(currpid, virtpage, source, npages)
 }
 
 

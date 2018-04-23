@@ -187,6 +187,21 @@ sysinit()
 #endif
 
 	pptr = &proctab[NULLPROC];	/* initialize null process entry */
+
+    /*========================================================================*/
+    /* Initialization Code for PA3                                            */
+	/*========================================================================*/
+	pd_t pdentry;                        // Pointer to Page Directory
+	init_bsm();                          // Initialize backing store map table
+	init_frame();                        // Initialize frame table
+	create_global_page_tables();         // Create page tables for global memory
+	set_evec(14, pfintr);                // Set page fault handler
+	enable_paging();                     // Set CR0 reg to enable paging
+	pdentry = new_page_dir(NULLPROC);    // Create new page directory
+	if (pdentry == SYSERR) { return SYSERR };
+	write_cr3(pptr->pdbr);               // Set CR3 red to correct page dir
+	/*========================================================================*/
+
 	pptr->pstate = PRCURR;
 	for (j=0; j<7; j++)
 		pptr->pname[j] = "prnull"[j];
@@ -263,4 +278,23 @@ long sizmem()
 		}
 	}
 	return npages;
+}
+
+
+int create_global_page_tables() {
+	int i,j, frame_id, status;
+	pt_t *ptentry;
+
+	for (i=0; i<4; i++) {
+		frame_id = new_page_table(NULLPROC);
+		if (frame_id == SYSERR) {
+		return(SYSERR);
+		}
+		global_page_tables[i] = (unsigned long) (FRAME0 * NBPG) + (frame_id * NBPG);
+		for (j=0; j<1024; j++) {
+			ptentry->pt_pres = 1;
+			ptentry->pt_write = 1;
+			ptentry->pt_base = i * 1024 + j;
+		}
+	}
 }

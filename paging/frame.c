@@ -90,11 +90,8 @@ SYSCALL free_frm(int i) {
 	ptentry->pt_avail = 0;
 	ptentry->pt_base = 0;
 
-
 	// Reset all the values in the inverted page table 
 	clear_frm(fptr);
-
-
 }
 
 LOCAL clear_frm(fr_map_t *fptr) {
