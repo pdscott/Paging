@@ -28,17 +28,52 @@ SYSCALL init_frm() {
  *-------------------------------------------------------------------------
  */
 SYSCALL get_frm(int* avail) {
-	int num;
-
+	int num, lowcount, evicted, frame_id;
+	// Try to get a free frame that is unmapped
 	for (num=0; num < NFRAMES; num++) {
 		if (frm_tab[num].fr_status == FRM_UNMAPPED) {
 			*avail = num;
 			return(OK);
 		}
 	}
+	// No frames available - need to evict a frame
 	if (grpolicy() == SC) {
+		// cycle through the list two times, if needed
+		for(frame_id=0; frame_id<NFRAMES*2; frame_id++) {
+			frame_id = num % NFRAMES;
+			if ( frm_tab[frame_id].fr_type = FR_TBL ||
+				 frm_tab[frame_id].fr_type = FR_TBL) {
+				continue;
+			}
+			// Found an unreferenced frame - evict it
+			if (frm_tab[frame_id].fr_scbit == 0) {
+				evicted = frame_id;
+				break;
+			// Found a recently referenced frame - decrement
+			} else if (frm_tab[frame_id].fr_scbit == 1) {
+				frm_tab[frame_id].fr_scbit == 0;
+			}
+		}
+		// Write frame to backing store
+		free_frm(evicted);
+		// Return the evicted frame
+		*avail = evicted;
 		return(OK);
 	} else if (grpolicy() == LFU) {
+		lowcount = MAXINT;
+		evicted = -1;
+		for(frame_id=0; frame_id<NFRAMES; frame_id++) {
+			if ( frm_tab[frame_id].fr_type = FR_PAGE &&
+				 frm_tab[frame_id].fr_refcnt < lowcount) {
+				lowcount = frm_tab[frame_id].fr_refcnt;
+				evicted = frame_id;
+			}
+		}
+		if (evicted == -1) { return(SYSERR); }
+		// Write frame to backing store
+		free_frm(evicted);
+		// Return the evicted frame
+		*avail = evicted;
 		return(OK);
 	}
 	return(SYSERR);
@@ -64,7 +99,7 @@ SYSCALL free_frm(int i) {
 	vaddr = fptr->fr_vpno * NBPG;
 	status = bsm_lookup(fptr->fr_pid, vaddr, &store, &pageth);
 	if (status == SYSERR) { return(SYSERR); }
-	//write page if dirty?
+	write_bs(); ////////////
 
 	// Find the page table entry
 	pdoffset = (unsigned int) vaddr >> 22;
@@ -98,6 +133,7 @@ void clear_frm(fr_map_t *fptr) {
 	fptr->fr_refcnt = 0;
 	fptr->fr_type = FR_PAGE;
 	fptr->fr_dirty = 0;
+	fptr->fr_scbit = 0;
 }
 
 

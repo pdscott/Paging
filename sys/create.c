@@ -96,6 +96,19 @@ SYSCALL create(procaddr,ssize,priority,name,nargs,args)
 	*--saddr = 0;		/* %edi */
 	*pushsp = pptr->pesp = (unsigned long)saddr;
 
+    /*========================================================================*/
+    /* Initialization Code for PA3                                            */
+	/*========================================================================*/
+	int status;
+	// Initialize process table 
+	pptr->store = -1;
+	pptr->vhpno = -1;
+	pptr->vhpnpages = -1;
+	pptr->vmemlist = NULL;
+	// Create page directory
+	status = new_page_dir(pid);  // assigned to this pid within the function
+	if (status == SYSERR) { return(SYSERR); }
+	/*========================================================================*/
 	restore(ps);
 
 	return(pid);
