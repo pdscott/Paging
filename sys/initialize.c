@@ -48,6 +48,7 @@ int	console_dev;		/* the console device			*/
 
 /*  added for the demand paging */
 int page_replace_policy = SC;
+pt_t* global_page_tables[4];
 
 /************************************************************************/
 /***				NOTE:				      ***/
@@ -191,12 +192,12 @@ sysinit()
     /*========================================================================*/
     /* Initialization Code for PA3                                            */
 	/*========================================================================*/
-	pd_t pdentry;                        // Pointer to Page Directory
+	int status;                        
 	init_bsm();                          // Initialize backing store map table
 	init_frame();                        // Initialize frame table
 	create_global_page_tables();         // Create page tables for global memory
-	pdentry = new_page_dir(NULLPROC);    // Create new page directory
-	if (pdentry == SYSERR) { return SYSERR; }
+	status = new_page_dir(NULLPROC);    // Create new page directory
+	if (status == SYSERR) { return SYSERR; }
 	write_cr3(pptr->pdbr);               // Set CR3 red to correct page dir
 	set_evec(14, pfintr);                // Set page fault handler
 	enable_paging();                     // Set CR0 reg to enable paging
