@@ -33,9 +33,9 @@ SYSCALL get_frm(int* avail) {
 			return(OK);
 		}
 	}
-	if (page_replace_policy == SC) {
+	if (grpolicy() == SC) {
 		return(OK);
-	} else if (page_replace_policy == LFU) {
+	} else if (grpolicy() == LFU) {
 		return(OK);
 	}
 	return(SYSERR);
@@ -55,7 +55,7 @@ SYSCALL free_frm(int i) {
 	unsigned int ptoffset;
 	
 	if (i<0 || i>NFRAMES) { return(SYSERR); } 
-	fptr = frm_tab[i];
+	fptr = &frm_tab[i];
 	if (fptr->fr_type != FR_PAGE) { return(SYSERR); }
 	pid = fptr->fr_pid; 
 	vaddr = fptr->fr_vpno * NBPG;
@@ -65,9 +65,9 @@ SYSCALL free_frm(int i) {
 
 	// Find the page table entry
 	pdoffset = (unsigned int) vaddr >> 22;
-	ptoffset = (unsinged int) ((vaddr >> 12) & 0x000003FF);
+	ptoffset = (unsigned int) ((vaddr >> 12) & 0x000003FF);
 	pdentry = proctab[pid].pdbr + (pdoffset * sizeof(pd_t));
-	ptentry = (pdentry->pdbase) * NBPG + (ptoffset * sizeof(pt_t));
+	ptentry = (pdentry->pd_base) * NBPG + (ptoffset * sizeof(pt_t));
 
 	// Reset all the values in the page table entry
 	ptentry->pt_pres = 0;
@@ -84,9 +84,11 @@ SYSCALL free_frm(int i) {
 
 	// Reset all the values in the inverted page table 
 	clear_frm(fptr);
+
+	return(OK);
 }
 
-LOCAL clear_frm(fr_map_t *fptr) {
+void clear_frm(fr_map_t *fptr) {
 	fptr->fr_status = FRM_UNMAPPED;
 	fptr->fr_pid = -1;
 	fptr->fr_vpno = -1;
