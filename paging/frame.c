@@ -41,8 +41,8 @@ SYSCALL get_frm(int* avail) {
 		// cycle through the list two times, if needed
 		for(frame_id=0; frame_id<NFRAMES*2; frame_id++) {
 			frame_id = num % NFRAMES;
-			if ( frm_tab[frame_id].fr_type = FR_TBL ||
-				 frm_tab[frame_id].fr_type = FR_TBL) {
+			if ( frm_tab[frame_id].fr_type == FR_TBL ||
+				 frm_tab[frame_id].fr_type == FR_TBL) {
 				continue;
 			}
 			// Found an unreferenced frame - evict it
