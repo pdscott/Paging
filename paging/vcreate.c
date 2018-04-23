@@ -29,7 +29,7 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 					/* array in the code)		*/                    {
 	
 	int status, pid, pages;
-	unsigned long *haddr;
+	unsigned long *hpaddr;
 	bsd_t bs_id;
 	struct pentry *pptr;
 
@@ -52,11 +52,11 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 	// Update process table 
 	pptr = &proctab[pid];
 	pptr->store = bs_id;
-	pptr->bhpno = 4096;
-	pptr->hsize = hsize;
+	pptr->vhpno = 4096;
+	pptr->vhpnpages = hsize;
 	// Need to update vmemlist
-	heapaddr = (int *) (BACKING_STORE_BASE + (bs_id * BACKING_STORE_UNIT_SIZE))
-	*heapaddr = (struct mblock *) NULL;
+	hpaddr = (int *) (BACKING_STORE_BASE + (bs_id * BACKING_STORE_UNIT_SIZE))
+	*hpaddr = (struct mblock *) NULL;
 }
 
 /*------------------------------------------------------------------------
