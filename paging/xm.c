@@ -11,7 +11,7 @@
  *-------------------------------------------------------------------------
  */
 SYSCALL xmmap(int virtpage, bsd_t source, int npages) {
-	return bsm_map(currpid, virtpage, source, npages)
+	return bsm_map(currpid, virtpage, source, npages);
 }
 
 
