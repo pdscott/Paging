@@ -101,7 +101,7 @@ SYSCALL free_frm(int i) {
 	status = bsm_lookup(fptr->fr_pid, vaddr, &store, &pageth);
 	if (status == SYSERR) { return(SYSERR); }
 	fr_addr = FRAME0 * NBPG + i * NBPG;
-	write_bs(fr_addr, store, pageth);
+	write_bs((char  *) fr_addr, store, pageth);
 
 	// Find the page table entry
 	pdoffset = (unsigned int) vaddr >> 22;
