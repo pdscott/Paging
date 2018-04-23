@@ -27,13 +27,13 @@ WORD	*vgetmem(nbytes)
 
 	// Ensure there is memory left
 	pptr = &proctab[currpid];
-	if (pptr->vmemlist.mnext == NULL) {
+	if (pptr->vmemlist->mnext == NULL) {
 		restore(ps);
 		return((WORD *)SYSERR);
 	}
 	// Follow same approach as create.c
 	nbytes = (unsigned int) roundmb(nbytes);
-	for (q= pptr->vmemlist,p=pptr->memlist->mnext ;
+	for (q= pptr->vmemlist,p=pptr->vmemlist->mnext ;
 	     p != (struct mblock *) NULL ;
 	     q=p,p=p->mnext)                               {
 
