@@ -7,6 +7,7 @@
 
 extern pt_t* global_page_tables[4];
 extern int page_replace_policy;
+fr_map_t frm_tab[];
 /*-------------------------------------------------------------------------
  * srpolicy - set page replace policy 
  *-------------------------------------------------------------------------
