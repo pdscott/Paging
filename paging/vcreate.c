@@ -55,8 +55,8 @@ SYSCALL vcreate(procaddr,ssize,hsize,priority,name,nargs,args)
 	pptr->vhpno = 4096;
 	pptr->vhpnpages = hsize;
 	// Need to update vmemlist
-	hpaddr = (int *) (BACKING_STORE_BASE + (bs_id * BACKING_STORE_UNIT_SIZE))
-	*hpaddr = (struct mblock *) NULL;
+	//hpaddr = (int *) (BACKING_STORE_BASE + (bs_id * BACKING_STORE_UNIT_SIZE))
+	//*hpaddr = (struct mblock *) NULL;
 }
 
 /*------------------------------------------------------------------------
