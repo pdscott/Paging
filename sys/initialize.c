@@ -283,19 +283,20 @@ long sizmem()
 
 
 int create_global_page_tables() {
-	int i,j, frame_id, status;
+	int page, entry, frame_id, status;
 	pt_t *ptentry;
 
-	for (i=0; i<4; i++) {
+	for (page=0; page<4; page++) {
 		frame_id = new_page_table(NULLPROC);
 		if (frame_id == SYSERR) {
 		return(SYSERR);
 		}
-		global_page_tables[i] = (unsigned long) (FRAME0 * NBPG) + (frame_id * NBPG);
-		for (j=0; j<1024; j++) {
+		global_page_tables[page] = (unsigned long) (FRAME0 * NBPG) + (frame_id * NBPG);
+		for (entry=0; entry<1024; entry++) {
+			ptentry = global_page_tables[page] * NBPG + entry * sizeof(pt_t);
 			ptentry->pt_pres = 1;
 			ptentry->pt_write = 1;
-			ptentry->pt_base = i * 1024 + j;
+			ptentry->pt_base = page * 1024 + entry;
 		}
 	}
 }

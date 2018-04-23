@@ -72,8 +72,16 @@ SYSCALL release_bs(bsd_t);
 SYSCALL read_bs(char *, bsd_t, int);
 SYSCALL write_bs(char *, bsd_t, int);
 SYSCALL get_frm(int* avail);
+SYSCALL init_bsm();
+SYSCALL get_bsm(int* avail);
 SYSCALL free_bsm(int i);
+SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth);
+SYSCALL bsm_map(int pid, int vpno, int source, int npages);
+SYSCALL bsm_unmap(int pid, int vpno, int flag);
 SYSCALL init_frm();
+SYSCALL get_frm(int* avail);
+SYSCALL free_frm(int i);
+SYSCALL grpolicy();
 
 #define NBPG		4096	/* number of bytes per page	*/
 #define FRAME0		1024	/* zero-th frame		*/
