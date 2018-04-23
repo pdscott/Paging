@@ -2,9 +2,10 @@
 
 #include <conf.h>
 #include <kernel.h>
-#include <paging.h>
 #include <proc.h>
+#include <paging.h>
 
+bs_map_t bsm_tab[];
 /*-------------------------------------------------------------------------
  * init_bsm- initialize bsm_tab
  *-------------------------------------------------------------------------
