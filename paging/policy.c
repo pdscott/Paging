@@ -2,6 +2,7 @@
 
 #include <conf.h>
 #include <kernel.h>
+#include <proc.h>
 #include <paging.h>
 
 extern pt_t* global_page_tables[4];
@@ -35,7 +36,7 @@ int new_page_dir(int pid) {
 	if (status == SYSERR) { return(SYSERR); }
 
 	// Initialize the new frame in frame table
-	fptr = frm_tab[frame_id];
+	fptr = &frm_tab[frame_id];
 	fptr->fr_status = FRM_MAPPED;
 	fptr->fr_pid = pid;
 	fptr->fr_vpno = -1;
@@ -70,7 +71,7 @@ int new_page_dir(int pid) {
 		pdentry->pd_avail = 0;
 	}
 
-	return frame_id
+	return frame_id;
 }
 
 int new_page_table(int pid) {
@@ -102,14 +103,14 @@ int new_page_table(int pid) {
 		ptentry->pt_pwt = 0;
 		ptentry->pt_pcd = 0;
 		ptentry->pt_acc = 0;
-		ptentry->dirty = 0;
+		ptentry->pt_dirty = 0;
 		ptentry->pt_mbz = 0;
 		ptentry->pt_global = 0;
-		ptentry->avail = 0;
+		ptentry->pt_avail = 0;
 		ptentry->pt_base = 0;
 	}
 
-	return frame_id
+	return frame_id;
 }
 
 
