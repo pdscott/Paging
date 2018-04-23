@@ -4,7 +4,6 @@
 #include <paging.h>
 
 int get_bs(bsd_t bs_id, unsigned int npages) {
-	int status;
 	bs_map_t *bsptr;
 
 	// Check page count

@@ -43,7 +43,7 @@ int new_page_dir(int pid) {
 	fptr->fr_refcnt = 0;
 	fptr->fr_type = FR_DIR;
 	fptr->fr_dirty = 0;
-	pptr = proctab[pid];
+	pptr = &proctab[pid];
 
 	// Document location of directory in process table
 	pptr->pdbr = (unsigned long) (FRAME0 * NBPG) + (frame_id * NBPG);
@@ -84,7 +84,7 @@ int new_page_table(int pid) {
 	if (status == SYSERR) { return(SYSERR); }
 
 	// Initialize the new frame in frame table
-	fptr = frm_tab[frame_id];
+	fptr = &frm_tab[frame_id];
 	fptr->fr_status = FRM_MAPPED;
 	fptr->fr_pid = pid;
 	fptr->fr_vpno = -1;
