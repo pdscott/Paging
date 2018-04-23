@@ -26,7 +26,7 @@ SYSCALL	vfreemem(block, size)
 	disable(ps);
 
 	// Find the correct block
-	for( p=pptr->vmemlist->mnext,q= pptr->memlist;
+	for( p=pptr->vmemlist->mnext,q= pptr->vmemlist;
 	     p != (struct mblock *) NULL && p < block ;
 	     q=p,p=p->mnext )                             {
 		; // do nothing
