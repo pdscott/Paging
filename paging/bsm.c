@@ -14,13 +14,13 @@ SYSCALL init_bsm() {
     bs_map_t *bsptr;
 
     for (i=0; i<16; i++) {
-        bsptr = bsm_tab[i];
+        bsptr = &bsm_tab[i];
         bsptr->bs_status = BSM_UNMAPPED;
-        bsptr->pid = -1;
-        bsptr->vpno = -1;
-        bsptr->npages = 0;
+        bsptr->bs_pid = -1;
+        bsptr->bs_vpno = -1;
+        bsptr->bs_npages = 0;
     }
-
+    return(OK);
 }
 
 /*-------------------------------------------------------------------------
@@ -48,12 +48,12 @@ SYSCALL free_bsm(int i) {
     // should not release a shared backing store
     bs_map_t *bsptr;
 
-    bsptr = bsm_tab[i];
+    bsptr = &bsm_tab[i];
     if (bsptr->bs_status == BSM_UNMAPPED) { return(SYSERR); }
     bsptr->bs_status = BSM_UNMAPPED;
-    bsptr->pid = -1;
-    bsptr->vpno = -1;
-    bsptr->npages = 0;
+    bsptr->bs_pid = -1;
+    bsptr->bs_vpno = -1;
+    bsptr->bs_npages = 0;
     return(OK);
 
 }
@@ -71,9 +71,9 @@ SYSCALL bsm_lookup(int pid, long vaddr, int* store, int* pageth) {
     
     vpno = ((unsigned long)vaddr)>>12;
     for (bs_id=0; bs_id<16; bs_id++) {
-        bsptr = bsmap[bs_id];
+        bsptr = bsm_tab[bs_id];
         if (bsptr->bs_status != BSM_UNMAPPED) {
-            if (bsptr->bsvpno <= vpno && vpno <= (bsptr->bs_vpno + bsptr->bsnpages)) {
+            if (bsptr->bs_vpno <= vpno && vpno <= (bsptr->bs_vpno + bsptr->bs_npages)) {
             	*store = bs_id;
                 *pageth = vpno - bsptr->bs_vpno;
                 return(OK);
@@ -93,12 +93,12 @@ SYSCALL bsm_map(int pid, int vpno, int source, int npages) {
     if (vpno < 0 || vpno > 4096) { return(SYSERR); }
     if (bsm_tab[source].bs_status != BSM_UNMAPPED) { return(SYSERR); }
 
-    if (bsm_tab[source].bs_status == BSM_UNMAPPED) {
-        bsm_tab[source].bs_status == BSM_MAPPED;
-        bsm_tab[source].bs_pid = pid;
-        bsm_tab[source].bs_vpno = vpno;
-        bsm_tab[source].bs_npages = npages;
-    }
+
+    bsm_tab[source].bs_status == BSM_MAPPED;
+    bsm_tab[source].bs_pid = pid;
+    bsm_tab[source].bs_vpno = vpno;
+    bsm_tab[source].bs_npages = npages;
+
     return(OK);
 }
 
@@ -116,6 +116,8 @@ SYSCALL bsm_unmap(int pid, int vpno, int flag) {
     if (status == SYSERR) { return(SYSERR); }
     
     // remove mapping
+
+    return(OK);
     
 }
 
