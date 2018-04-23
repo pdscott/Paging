@@ -74,7 +74,7 @@ int new_page_dir(int pid) {
 	return frame_id;
 }
 
-int new_page_table(int pid) {
+pt_t* new_page_table(int pid) {
 	int frame_id, status, i;
 	unsigned long frm_addr;
 	pt_t *ptentry;
@@ -111,7 +111,7 @@ int new_page_table(int pid) {
 		ptentry->pt_base = 0;
 	}
 
-	return frame_id;
+	return (pt_t *) frm_addr;
 }
 
 
