@@ -20,8 +20,11 @@ SYSCALL xmmap(int virtpage, bsd_t source, int npages) {
  * xmunmap - xmunmap
  *-------------------------------------------------------------------------
  */
-SYSCALL xmunmap(int virtpage)
-{
-  kprintf("To be implemented!");
-  return SYSERR;
+SYSCALL xmunmap(int virtpage) {
+	int status;
+
+	status = bsm_unmap(currpid, virtpage, 0);
+	if (status == SYSERR) { return(SYSERR); }
+
+	return(OK);
 }
