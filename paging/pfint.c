@@ -18,7 +18,9 @@ SYSCALL pfint() {
 	struct pentry *pptr;
 	pd_t *pdentry;
 	pt_t *ptentry;
+	STATWORD ps;
 
+	disable(ps);
 	// 1. get faulted address
 	// 2. get virtual page number
 	addr = read_cr2();
@@ -64,24 +66,10 @@ SYSCALL pfint() {
 		ptentry[ptoffset].pt_pres = 1;
 		ptentry[ptoffset].pt_write = 1;
 		ptentry[ptoffset].pt_base = faddr >> 12;
-
 	} 
-
-
-
-	write cr3(pptr->pdbr);
-
-
-
-
-
-
-
-
-
-
-
-
+	write_cr3(pptr->pdbr);
+  	restore(ps);
+  	return OK;
 }
 
 
