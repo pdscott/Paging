@@ -51,7 +51,7 @@ SYSCALL pfint() {
 
 	// Page in faulted pages
 	if (ptentry[ptoffset].pt_pres == 0) {
-		status = get_frm(frame);
+		status = get_frm(&frame);
 		if (ptentry == SYSERR) { kill(currpid); }
 		frm_tab[frame].fr_vpno = addr >> 12;
 		frm_tab[frame].fr_refcnt++;
@@ -59,7 +59,7 @@ SYSCALL pfint() {
 			frm_tab[frame].fr_scbit == 1;
 		}
 		faddr = FRAME0*NBPG + frame*NBPG;
-		status = read_bs(faddr, store, pageth);
+		status = read_bs((char *) faddr, store, pageth);
 		if (status == SYSERR) { kill(currpid); } 
 		ptentry[ptoffset].pt_pres = 1;
 		ptentry[ptoffset].pt_write = 1;
